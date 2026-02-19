@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotería Predictor Colombia - Análisis Predictivo</title>
+    
+    <!-- META TAGS PARA PWA -->
+    <meta name="description" content="Sistema de análisis predictivo para loterías colombianas basado en datos históricos">
+    <meta name="keywords" content="lotería, colombia, predicción, análisis, estadística, sorteos">
+    <meta name="author" content="Lotería Predictor">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tudominio.com/">
+    <meta property="og:title" content="Lotería Predictor Colombia">
+    <meta property="og:description" content="Análisis predictivo basado en datos históricos">
+    <meta property="og:image" content="/public/images/logo.png">
+    
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons 1.10.0 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Animate.css 4.1.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="public/css/styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="public/images/favicon.ico">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-graph-up-arrow me-2"></i>
+                <span class="fw-bold">Lotería Predictor</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <button id="refreshBtn" class="btn btn-outline-light btn-sm me-2">
+                            <i class="bi bi-arrow-clockwise"></i> Actualizar
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#infoModal">
+                            <i class="bi bi-info-circle"></i> Ayuda
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <header class="text-center mb-5">
+            <h1 class="display-4 text-primary animate__animated animate__fadeInDown">
+                <i class="bi bi-bar-chart-fill"></i> Lotería Predictor Colombia
+            </h1>
+            <p class="lead text-muted">Análisis predictivo basado en datos históricos y algoritmos estadísticos</p>
+            <div class="alert alert-info alert-dismissible fade show mx-auto" style="max-width: 600px;">
+                <i class="bi bi-lightbulb me-2"></i>
+                <strong>¿Cómo funciona?</strong> Selecciona una lotería, revisa el historial y obtén recomendaciones basadas en patrones estadísticos.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Selector de Lotería -->
+            <div class="card mb-4 border-0 shadow-sm animate__animated animate__fadeInUp">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-card-checklist me-2"></i> Selecciona una Lotería</h5>
+                    <span class="badge bg-light text-primary" id="contadorSorteos">0 sorteos</span>
+                </div>
+                <div class="card-body">
+                    <select id="lotterySelect" class="form-select form-select-lg">
+                        <option value="">Cargando loterías...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row: Historial + Análisis -->
+            <div class="row">
+                <!-- Historial -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i> Historial Reciente</h5>
+                            <!-- BOTÓN AGREGAR SORTEO -->
+                            <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#agregarSorteoModal">
+                                <i class="bi bi-plus-circle me-1"></i> Agregar Sorteo
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-hover table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th width="40%">Fecha</th>
+                                            <th width="50%">Número Ganador</th>
+                                            <th width="10%" class="text-end">Días</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTable">
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted py-5">
+                                                <div class="py-3">
+                                                    <i class="bi bi-database-exclamation display-6 text-muted mb-3"></i>
+                                                    <p class="mb-0">Selecciona una lotería para ver el historial</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted small">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Solo se muestran los últimos 20 sorteos. Análisis completo con todos los datos.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Análisis y Resultados -->
+                <div class="col-lg-5 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-magic me-2"></i> Recomendación del Sistema</h5>
+                        </div>
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <div class="mb-4">
+                                <div class="display-1 text-muted fw-bold mb-2" style="font-family: 'Courier New', monospace;">
+                                    0000
+                                </div>
+                                <small class="text-muted">Número principal recomendado</small>
+                            </div>
+                            
+                            <button id="analyzeBtn" class="btn btn-success btn-lg py-3 mb-3" disabled>
+                                <i class="bi bi-play-circle me-2"></i> 
+                                <span class="button-text">Analizar Sorteos</span>
+                            </button>
+                            
+                            <div class="alert alert-warning small text-start">
+                                <i class="bi bi-shield-exclamation me-2"></i>
+                                <strong>Aviso:</strong> Este es un análisis estadístico. No garantiza resultados. Juega responsablemente.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top 5 Recomendaciones -->
+            <div class="card mb-4 border-0 shadow-sm animate__animated animate__fadeInUp">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-trophy me-2"></i> Top 5 Recomendaciones</h5>
+                    <small class="text-muted">Ordenadas por probabilidad estadística</small>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-warning">
+                                <tr>
+                                    <th width="10%" class="text-center">Posición</th>
+                                    <th width="50%">Número</th>
+                                    <th width="40%" class="text-end">Probabilidad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top5Table">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <div class="py-2">
+                                            <i class="bi bi-graph-up display-6 text-muted mb-3"></i>
+                                            <p class="mb-0">Los resultados aparecerán aquí después del análisis</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="row mb-4" id="estadisticasContainer">
+                <!-- Las estadísticas se generarán dinámicamente -->
+            </div>
+
+            <!-- Notas Importantes -->
+            <div class="alert alert-secondary">
+                <h6><i class="bi bi-lightbulb-fill me-2"></i>¿Cómo interpretar los resultados?</h6>
+                <ul class="mb-0">
+                    <li>El <strong>número principal</strong> es la recomendación con mayor score estadístico.</li>
+                    <li>El <strong>Top 5</strong> muestra alternativas con alta probabilidad.</li>
+                    <li>Los porcentajes indican la confianza del modelo, no probabilidad de ganar.</li>
+                    <li>Los datos históricos se actualizan automáticamente desde Google Sheets.</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="mt-5 pt-4 border-top text-center text-muted">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <h6 class="text-uppercase">Lotería Predictor Colombia v2.0</h6>
+                    <p class="mb-0 small">Sistema de análisis predictivo para fines educativos y estadísticos</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h6 class="text-uppercase">Responsabilidad</h6>
+                    <p class="mb-0 small">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Juego responsable. Mayores de edad. Los resultados son probabilísticos, no garantizados.
+                    </p>
+                </div>
+            </div>
+            <p class="mt-3 small">
+                &copy; <span id="currentYear"></span> Lotería Predictor. Todos los análisis son estadísticos.
+            </p>
+        </footer>
+    </div>
+
+    <!-- Modal de Información -->
+    <div class="modal fade" id="infoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-question-circle me-2"></i>Acerca de Lotería Predictor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>¿Cómo funciona?</h6>
+                    <p>El sistema analiza patrones estadísticos en sorteos históricos para identificar tendencias y generar recomendaciones probabilísticas.</p>
+                    
+                    <h6>Fuentes de datos</h6>
+                    <ul>
+                        <li><strong>Google Sheets:</strong> Datos reales actualizados</li>
+                    </ul>
+                    
+                    <h6>Tecnologías utilizadas</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-primary">Python Flask</span>
+                        <span class="badge bg-success">Google Apps Script</span>
+                        <span class="badge bg-info">Bootstrap 5</span>
+                        <span class="badge bg-warning">JavaScript</span>
+                        <span class="badge bg-danger">PWA</span>
+                    </div>
+                    
+                    <div class="alert alert-warning small">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Importante:</strong> Este sistema es para análisis estadístico. No garantiza resultados de sorteos reales.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Sorteo -->
+    <div class="modal fade" id="agregarSorteoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Agregar Nuevo Sorteo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAgregarSorteo">
+                        <div class="mb-3">
+                            <label for="sorteoLoteria" class="form-label">Lotería *</label>
+                            <select id="sorteoLoteria" class="form-select" required>
+                                <option value="">-- Selecciona una lotería --</option>
+                            </select>
+                            <small class="text-muted">El sorteo se agregará a la hoja de esta lotería</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="sorteoFecha" class="form-label">Fecha del sorteo *</label>
+                            <input type="date" id="sorteoFecha" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="sorteoNumero" class="form-label">Número ganador * (4 dígitos)</label>
+                            <input type="number" id="sorteoNumero" class="form-control" 
+                                   min="0" max="9999" required placeholder="Ej: 1588">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="sorteoSerie" class="form-label">Serie *</label>
+                            <input type="text" id="sorteoSerie" class="form-control" 
+                                   maxlength="4" required placeholder="Ej: 201">
+                        </div>
+
+                        <div class="alert alert-info small" id="alertLoteriaSeleccionada" style="display: none;">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Se agregará a la hoja: <strong id="sorteoLoteriaConfirm"></strong>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnGuardarSorteo" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts propios -->
+    <script src="public/js/api.js"></script>
+    <script src="public/js/app.js"></script>
+    
+    <!-- Inicialización -->
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('⚠️ Service Worker no registrado:', error);
+                    });
+            });
+        }
+        
+        window.addEventListener('online', function() {
+            console.log('✅ Conexión restaurada');
+        });
+        
+        window.addEventListener('offline', function() {
+            console.log('⚠️ Sin conexión a internet');
+        });
+    </script>
+</body>
+</html>
